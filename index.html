@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ricky Tucker — Lead Product Designer</title>
+  <style>
+    /* ─────────────────────────────────────────
+       RESET & BASE
+    ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --menubar-h: 30px;
+      --dock-w: 108px;
+      --glass-light: rgba(255,255,255,0.72);
+      --glass-border: rgba(255,255,255,0.55);
+      --text-dark: #1a1a2e;
+      --text-muted: rgba(30,20,60,0.55);
+      --shadow-window: 0 32px 80px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.25);
+      --radius-window: 12px;
+      --radius-icon: 18px;
+      --font: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      font-family: var(--font);
+      user-select: none;
+      cursor: default;
+    }
+
+    /* ─────────────────────────────────────────
+       BACKGROUND LAYERS
+    ───────────────────────────────────────── */
+    #bg {
+      position: fixed; inset: 0; z-index: 0;
+      background: url('assets/fun background.jpg') center/cover no-repeat;
+    }
+
+    #bg-overlay {
+      position: fixed; inset: 0; z-index: 1;
+      background: rgba(80, 40, 180, 0.18);
+      transition: background 0.5s ease;
+      pointer-events: none;
+    }
+
+    /* Subtle scanline texture */
+    #scanlines {
+      position: fixed; inset: 0; z-index: 2;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+      pointer-events: none;
+    }
+
+    /* ─────────────────────────────────────────
+       MENU BAR
+    ───────────────────────────────────────── */
+    #menubar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--menubar-h);
+      z-index: 9000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      background: rgba(20,10,40,0.72);
+      backdrop-filter: blur(30px) saturate(180%);
+      -webkit-backdrop-filter: blur(30px) saturate(180%);
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .mb-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mb-logo {
+      font-size: 16px;
+      color: #fff;
+      opacity: 0.9;
+    }
+
+    .mb-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.02em;
+    }
+
+    .mb-sep {
+      width: 1px; height: 14px;
+      background: rgba(255,255,255,0.2);
+    }
+
+    .mb-subtitle {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .mb-center {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.03em;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .mb-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mb-status {
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .mb-icon {
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    #clock {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.03em;
+    }
+
+    /* ─────────────────────────────────────────
+       RIGHT ICON DOCK
+    ───────────────────────────────────────── */
+    #icon-dock {
+      position: fixed;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 8000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 10px;
+      background: rgba(0,0,0,0.28);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 22px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+
+    .app-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .app-icon:hover { transform: scale(1.12); }
+    .app-icon:active { transform: scale(0.94); }
+
+    .icon-img {
+      width: 56px; height: 56px;
+      border-radius: var(--radius-icon);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.25);
+      transition: box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .icon-img::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.22), transparent);
+      border-radius: var(--radius-icon) var(--radius-icon) 0 0;
+    }
+
+    .app-icon:hover .icon-img {
+      box-shadow: 0 8px 28px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.35);
+    }
+
+    .icon-after-ai  .icon-img { background: linear-gradient(145deg, #a78bfa, #4f46e5); }
+    .icon-before-ai .icon-img { background: linear-gradient(145deg, #f97316, #dc2626); }
+    .icon-about     .icon-img { background: linear-gradient(145deg, #38bdf8, #0ea5e9); }
+    .icon-resume    .icon-img { background: linear-gradient(145deg, #34d399, #059669); }
+
+    .icon-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #fff;
+      text-align: center;
+      letter-spacing: 0.03em;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+      max-width: 68px;
+      line-height: 1.2;
+    }
+
+    .icon-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.6);
+      display: none;
+    }
+    .app-icon.open .icon-dot { display: block; }
+
+    /* ─────────────────────────────────────────
+       WINDOWS
+    ───────────────────────────────────────── */
+    .window {
+      position: fixed;
+      min-width: 320px;
+      min-height: 200px;
+      border-radius: var(--radius-window);
+      box-shadow: var(--shadow-window);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(255,255,255,0.45);
+      transition: box-shadow 0.2s;
+    }
+
+    .window.animating {
+      transition: left   0.32s cubic-bezier(0.4,0,0.2,1),
+                  top    0.32s cubic-bezier(0.4,0,0.2,1),
+                  width  0.32s cubic-bezier(0.4,0,0.2,1),
+                  height 0.32s cubic-bezier(0.4,0,0.2,1),
+                  border-radius 0.32s cubic-bezier(0.4,0,0.2,1),
+                  box-shadow    0.32s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .window.maximized {
+      border-radius: 0 !important;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-bottom-color: transparent;
+    }
+
+    .window.focused {
+      box-shadow: 0 40px 100px rgba(0,0,0,0.55), 0 2px 12px rgba(0,0,0,0.3),
+                  0 0 0 1px rgba(255,255,255,0.2);
+    }
+
+    .window.minimized .window-body { display: none; }
+    .window.minimized .resize-handle { display: none; }
+
+    /* Title Bar */
+    .window-titlebar {
+      height: 38px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      cursor: grab;
+      position: relative;
+      /* Classic Mac pinstripe texture */
+      background:
+        repeating-linear-gradient(
+          transparent, transparent 1px,
+          rgba(255,255,255,0.06) 1px, rgba(255,255,255,0.06) 2px
+        ),
+        linear-gradient(to bottom,
+          rgba(255,255,255,0.45) 0%,
+          rgba(255,255,255,0.22) 100%
+        );
+      backdrop-filter: blur(40px) saturate(200%);
+      -webkit-backdrop-filter: blur(40px) saturate(200%);
+      border-bottom: 1px solid rgba(255,255,255,0.35);
+    }
+
+    .window-titlebar:active { cursor: grabbing; }
+
+    .window.unfocused .window-titlebar {
+      background:
+        repeating-linear-gradient(
+          transparent, transparent 1px,
+          rgba(255,255,255,0.03) 1px, rgba(255,255,255,0.03) 2px
+        ),
+        linear-gradient(to bottom,
+          rgba(255,255,255,0.28) 0%,
+          rgba(255,255,255,0.12) 100%
+        );
+    }
+
+    /* Traffic light buttons */
+    .window-controls {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      z-index: 1;
+    }
+
+    .wc-btn {
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: filter 0.15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .wc-btn::after {
+      content: '';
+      font-size: 9px;
+      font-weight: 900;
+      color: rgba(0,0,0,0.5);
+      opacity: 0;
+      transition: opacity 0.15s;
+      line-height: 1;
+    }
+
+    .window-controls:hover .wc-btn::after { opacity: 1; }
+
+    .btn-close   { background: #ff5f57; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.12); }
+    .btn-minimize{ background: #febc2e; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.12); }
+    .btn-zoom    { background: #28c840; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.12); }
+
+    .btn-close::after   { content: '✕'; font-size: 7px; }
+    .btn-minimize::after{ content: '−'; font-size: 10px; }
+    .btn-zoom::after    { content: '+'; font-size: 10px; }
+
+    .btn-close:hover   { filter: brightness(0.85); }
+    .btn-minimize:hover{ filter: brightness(0.85); }
+    .btn-zoom:hover    { filter: brightness(0.85); }
+
+    .window-title {
+      position: absolute;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(20,10,50,0.8);
+      letter-spacing: 0.04em;
+      pointer-events: none;
+    }
+
+    .window.unfocused .window-title { color: rgba(20,10,50,0.4); }
+
+    /* Window Body */
+    .window-body {
+      flex: 1;
+      overflow: auto;
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(40px) saturate(200%);
+      -webkit-backdrop-filter: blur(40px) saturate(200%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Resize handle */
+    .resize-handle {
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 20px; height: 20px;
+      cursor: se-resize;
+      z-index: 10;
+    }
+
+    .resize-handle::after {
+      content: '';
+      position: absolute;
+      bottom: 4px; right: 4px;
+      width: 10px; height: 10px;
+      background:
+        repeating-linear-gradient(
+          -45deg,
+          rgba(0,0,0,0.2),
+          rgba(0,0,0,0.2) 1px,
+          transparent 1px,
+          transparent 3px
+        );
+      border-radius: 1px;
+    }
+
+    /* ─── Smiley Window Content ─── */
+    .smiley-window {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%; height: 100%;
+      padding: 2rem;
+    }
+
+    .smiley-emoji {
+      font-size: 80px;
+      line-height: 1;
+      animation: float 3s ease-in-out infinite;
+      filter: drop-shadow(0 8px 20px rgba(0,0,0,0.15));
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(-2deg); }
+      50% { transform: translateY(-12px) rotate(2deg); }
+    }
+
+    .smiley-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* ─── Resume Window Content ─── */
+    .resume-window {
+      display: flex;
+      flex-direction: column;
+      width: 100%; height: 100%;
+    }
+
+    .resume-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: rgba(240,237,255,0.9);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      flex-shrink: 0;
+    }
+
+    .resume-url {
+      flex: 1;
+      font-size: 11px;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.8);
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      cursor: text;
+    }
+
+    .resume-open-btn {
+      font-size: 11px;
+      font-weight: 600;
+      color: #4f46e5;
+      background: rgba(79,70,229,0.1);
+      border: 1px solid rgba(79,70,229,0.3);
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .resume-open-btn:hover { background: rgba(79,70,229,0.18); }
+
+    .resume-iframe {
+      flex: 1;
+      border: none;
+      width: 100%;
+      background: #fff;
+    }
+
+    /* ─────────────────────────────────────────
+       COLOR PANEL
+    ───────────────────────────────────────── */
+    #color-panel {
+      position: fixed;
+      bottom: 18px;
+      left: 18px;
+      z-index: 8500;
+      background: rgba(20,10,45,0.75);
+      backdrop-filter: blur(30px) saturate(200%);
+      -webkit-backdrop-filter: blur(30px) saturate(200%);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 16px;
+      padding: 12px 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+      min-width: 180px;
+    }
+
+    .cp-header {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 10px;
+    }
+
+    .cp-swatches {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .cp-swatch {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .cp-swatch:hover { transform: scale(1.2); }
+    .cp-swatch.active {
+      border-color: #fff;
+      transform: scale(1.15);
+      box-shadow: 0 2px 12px rgba(255,255,255,0.3);
+    }
+
+    .cp-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cp-row label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.45);
+      white-space: nowrap;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .cp-row input[type=range] {
+      flex: 1;
+      height: 4px;
+      accent-color: #a78bfa;
+      cursor: pointer;
+    }
+
+    /* ─────────────────────────────────────────
+       DESKTOP HINT
+    ───────────────────────────────────────── */
+    #desktop-hint {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 500;
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.06em;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+      pointer-events: none;
+      animation: fadeHint 4s forwards 2s;
+    }
+
+    @keyframes fadeHint {
+      0% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* ─────────────────────────────────────────
+       MOBILE
+    ───────────────────────────────────────── */
+    @media (max-width: 640px) {
+      #icon-dock {
+        right: auto;
+        top: auto;
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        flex-direction: row;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 20px;
+      }
+
+      .icon-img { width: 48px; height: 48px; font-size: 22px; }
+      .icon-label { font-size: 9px; }
+
+      #color-panel {
+        bottom: 90px;
+        left: 12px;
+      }
+
+      #desktop-hint { bottom: 90px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background -->
+  <div id="bg"></div>
+  <div id="bg-overlay"></div>
+  <div id="scanlines"></div>
+
+  <!-- Menu Bar -->
+  <div id="menubar">
+    <div class="mb-left">
+      <span class="mb-logo">✦</span>
+      <span class="mb-name">RC Tucker</span>
+      <div class="mb-sep"></div>
+      <span class="mb-subtitle">Lead Product Designer</span>
+    </div>
+    <div class="mb-center" id="mb-active-title"></div>
+    <div class="mb-right">
+      <div class="mb-status">
+        <span class="mb-icon">◈</span>
+        <span class="mb-icon">⌘</span>
+        <span id="clock">00:00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Icon Dock -->
+  <div id="icon-dock">
+    <div class="app-icon icon-after-ai" data-app="after-ai">
+      <div class="icon-img">✨</div>
+      <div class="icon-label">After A.I.</div>
+      <div class="icon-dot"></div>
+    </div>
+    <div class="app-icon icon-before-ai" data-app="before-ai">
+      <div class="icon-img">💾</div>
+      <div class="icon-label">Before A.I.</div>
+      <div class="icon-dot"></div>
+    </div>
+    <div class="app-icon icon-about" data-app="about">
+      <div class="icon-img">🙋</div>
+      <div class="icon-label">About</div>
+      <div class="icon-dot"></div>
+    </div>
+    <div class="app-icon icon-resume" data-app="resume">
+      <div class="icon-img">📄</div>
+      <div class="icon-label">Resume</div>
+      <div class="icon-dot"></div>
+    </div>
+  </div>
+
+  <!-- Color Control Panel -->
+  <div id="color-panel">
+    <div class="cp-header">Background Tint</div>
+    <div class="cp-swatches" id="cp-swatches"></div>
+    <div class="cp-row">
+      <label>Intensity</label>
+      <input type="range" id="cp-opacity" min="0" max="60" value="18" />
+    </div>
+  </div>
+
+  <!-- Desktop hint -->
+  <div id="desktop-hint">← Click the icons to explore</div>
+
+  <script>
+    'use strict';
+
+    /* ─────────────────────────────────────────
+       CLOCK
+    ───────────────────────────────────────── */
+    function updateClock() {
+      document.getElementById('clock').textContent =
+        new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    /* ─────────────────────────────────────────
+       COLOR PANEL
+    ───────────────────────────────────────── */
+    const overlay = document.getElementById('bg-overlay');
+    const opacitySlider = document.getElementById('cp-opacity');
+
+    const tints = [
+      { label: 'Indigo',   rgb: '80,40,180',    hex: '#5028b4' },
+      { label: 'Violet',   rgb: '120,40,200',   hex: '#7828c8' },
+      { label: 'Cyan',     rgb: '0,140,200',    hex: '#008cc8' },
+      { label: 'Rose',     rgb: '220,30,90',    hex: '#dc1e5a' },
+      { label: 'Amber',    rgb: '200,100,10',   hex: '#c8640a' },
+      { label: 'Emerald',  rgb: '0,140,100',    hex: '#008c64' },
+      { label: 'Midnight', rgb: '10,5,30',      hex: '#0a051e' },
+      { label: 'Clear',    rgb: '0,0,0',        hex: '#ffffff' },
+    ];
+
+    let activeRgb = tints[0].rgb;
+    let activeOpacity = 0.18;
+
+    function applyTint() {
+      overlay.style.background = `rgba(${activeRgb}, ${activeOpacity})`;
+    }
+
+    const swatchContainer = document.getElementById('cp-swatches');
+    tints.forEach((t, i) => {
+      const sw = document.createElement('button');
+      sw.className = 'cp-swatch' + (i === 0 ? ' active' : '');
+      sw.style.background = t.hex;
+      sw.title = t.label;
+      sw.addEventListener('click', () => {
+        document.querySelectorAll('.cp-swatch').forEach(s => s.classList.remove('active'));
+        sw.classList.add('active');
+        activeRgb = t.rgb;
+        applyTint();
+      });
+      swatchContainer.appendChild(sw);
+    });
+
+    opacitySlider.addEventListener('input', () => {
+      activeOpacity = opacitySlider.value / 100;
+      applyTint();
+    });
+
+    applyTint();
+
+    /* ─────────────────────────────────────────
+       WINDOW MANAGER
+    ───────────────────────────────────────── */
+    let zTop = 100;
+    const openWindows = {};   // appId -> windowEl
+
+    function bringToFront(win) {
+      zTop++;
+      win.style.zIndex = zTop;
+      // Update menubar title
+      document.getElementById('mb-active-title').textContent =
+        win.querySelector('.window-title').textContent;
+      // Focus state
+      document.querySelectorAll('.window').forEach(w => {
+        w.classList.toggle('focused', w === win);
+        w.classList.toggle('unfocused', w !== win);
+      });
+    }
+
+    function randomPos(w, h) {
+      const pad = 24;
+      const safeRight = window.innerWidth - 120; // leave room for dock
+      const safeBottom = window.innerHeight - pad;
+      const maxLeft = Math.max(pad, safeRight - w);
+      const maxTop  = Math.max(var_menubarH() + pad, safeBottom - h);
+      return {
+        left: Math.floor(Math.random() * maxLeft) + pad,
+        top:  Math.floor(Math.random() * (maxTop - var_menubarH())) + var_menubarH() + pad
+      };
+    }
+
+    function var_menubarH() {
+      return parseInt(getComputedStyle(document.documentElement)
+        .getPropertyValue('--menubar-h')) || 30;
+    }
+
+    const smileys = [
+      '😊','😄','😁','🙂','😀','😃','🤩','😎',
+      '🥳','😋','🤗','😇','🌟','✨','💫','🎉',
+      '🦋','🌈','🎨','🚀','💡','🎸','🦄','🍀'
+    ];
+
+    const appConfig = {
+      'after-ai': {
+        title: 'After A.I.',
+        width: 420, height: 380,
+        buildContent: () => {
+          const emoji = smileys[Math.floor(Math.random() * smileys.length)];
+          const div = document.createElement('div');
+          div.className = 'smiley-window';
+          div.innerHTML = `
+            <div class="smiley-emoji">${emoji}</div>
+            <div class="smiley-note">After A.I. — Coming Soon</div>
+          `;
+          return div;
+        }
+      },
+      'before-ai': {
+        title: 'Before A.I.',
+        width: 420, height: 380,
+        buildContent: () => {
+          const emoji = smileys[Math.floor(Math.random() * smileys.length)];
+          const div = document.createElement('div');
+          div.className = 'smiley-window';
+          div.innerHTML = `
+            <div class="smiley-emoji">${emoji}</div>
+            <div class="smiley-note">Before A.I. — Coming Soon</div>
+          `;
+          return div;
+        }
+      },
+      'about': {
+        title: 'About RC Tucker',
+        width: 420, height: 380,
+        buildContent: () => {
+          const emoji = smileys[Math.floor(Math.random() * smileys.length)];
+          const div = document.createElement('div');
+          div.className = 'smiley-window';
+          div.innerHTML = `
+            <div class="smiley-emoji">${emoji}</div>
+            <div class="smiley-note">About — Coming Soon</div>
+          `;
+          return div;
+        }
+      },
+      'resume': {
+        title: 'Resume — RC Tucker',
+        width: 700, height: 520,
+        buildContent: () => {
+          const div = document.createElement('div');
+          div.className = 'resume-window';
+          div.innerHTML = `
+            <div class="resume-toolbar">
+              <span class="resume-url">www.rctucker.com</span>
+              <button class="resume-open-btn" onclick="window.open('https://www.rctucker.com','_blank')">
+                ↗ Open
+              </button>
+            </div>
+            <iframe
+              class="resume-iframe"
+              src="https://www.rctucker.com"
+              title="RC Tucker Resume"
+              allow="fullscreen"
+            ></iframe>
+          `;
+          return div;
+        }
+      }
+    };
+
+    function createWindow(appId) {
+      const cfg = appConfig[appId];
+      if (!cfg) return;
+
+      // If already open, bring to front
+      if (openWindows[appId]) {
+        const existing = openWindows[appId];
+        if (existing.classList.contains('minimized')) {
+          existing.classList.remove('minimized');
+        }
+        bringToFront(existing);
+        return;
+      }
+
+      const pos = randomPos(cfg.width, cfg.height);
+
+      const win = document.createElement('div');
+      win.className = 'window unfocused';
+      win.style.left   = pos.left + 'px';
+      win.style.top    = pos.top  + 'px';
+      win.style.width  = cfg.width + 'px';
+      win.style.height = cfg.height + 'px';
+      win.style.zIndex = zTop;
+
+      // Title bar
+      const titlebar = document.createElement('div');
+      titlebar.className = 'window-titlebar';
+      titlebar.innerHTML = `
+        <div class="window-controls">
+          <button class="wc-btn btn-close"    title="Close"></button>
+          <button class="wc-btn btn-minimize" title="Minimize"></button>
+          <button class="wc-btn btn-zoom"     title="Zoom"></button>
+        </div>
+        <div class="window-title">${cfg.title}</div>
+      `;
+
+      // Body
+      const body = document.createElement('div');
+      body.className = 'window-body';
+      body.appendChild(cfg.buildContent());
+
+      // Resize handle
+      const resizeHandle = document.createElement('div');
+      resizeHandle.className = 'resize-handle';
+
+      win.appendChild(titlebar);
+      win.appendChild(body);
+      win.appendChild(resizeHandle);
+      document.body.appendChild(win);
+
+      openWindows[appId] = win;
+
+      // Mark dock icon as open
+      const icon = document.querySelector(`.app-icon[data-app="${appId}"]`);
+      if (icon) icon.classList.add('open');
+
+      // Bring to front on creation
+      bringToFront(win);
+
+      // ── Drag ──
+      makeDraggable(win, titlebar);
+
+      // ── Resize ──
+      makeResizable(win, resizeHandle);
+
+      // ── Click to focus ──
+      win.addEventListener('mousedown', () => bringToFront(win));
+
+      // ── Close button ──
+      win.querySelector('.btn-close').addEventListener('click', (e) => {
+        e.stopPropagation();
+        win.remove();
+        delete openWindows[appId];
+        if (icon) icon.classList.remove('open');
+        document.getElementById('mb-active-title').textContent = '';
+        // Re-focus topmost remaining window
+        const remaining = document.querySelectorAll('.window');
+        if (remaining.length) bringToFront(remaining[remaining.length - 1]);
+      });
+
+      // ── Minimize button — restore to original size if maximized, else collapse ──
+      const origSize = {
+        left: pos.left + 'px', top: pos.top + 'px',
+        width: cfg.width + 'px', height: cfg.height + 'px'
+      };
+
+      win.querySelector('.btn-minimize').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (savedPos) {
+          // Currently maximized — restore to original opening size
+          win.classList.add('animating');
+          setTimeout(() => win.classList.remove('animating'), 350);
+          win.style.left   = origSize.left;
+          win.style.top    = origSize.top;
+          win.style.width  = origSize.width;
+          win.style.height = origSize.height;
+          win.classList.remove('maximized');
+          savedPos = null;
+        } else {
+          // Normal size — collapse to title bar only
+          win.classList.toggle('minimized');
+        }
+        bringToFront(win);
+      });
+
+      // ── Zoom (maximize / restore) ──
+      let savedPos = null;
+
+      function toggleMaximize() {
+        const mh = var_menubarH();
+        win.classList.add('animating');
+        setTimeout(() => win.classList.remove('animating'), 350);
+
+        if (!savedPos) {
+          // Save current size & position, then go full screen
+          savedPos = {
+            left: win.style.left, top: win.style.top,
+            width: win.style.width, height: win.style.height
+          };
+          win.style.left   = '0px';
+          win.style.top    = mh + 'px';
+          win.style.width  = window.innerWidth + 'px';
+          win.style.height = (window.innerHeight - mh) + 'px';
+          win.classList.add('maximized');
+        } else {
+          // Restore
+          win.style.left   = savedPos.left;
+          win.style.top    = savedPos.top;
+          win.style.width  = savedPos.width;
+          win.style.height = savedPos.height;
+          win.classList.remove('maximized');
+          savedPos = null;
+        }
+        bringToFront(win);
+      }
+
+      win.querySelector('.btn-zoom').addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMaximize();
+      });
+
+      // Double-click title bar also toggles maximize
+      titlebar.addEventListener('dblclick', (e) => {
+        if (e.target.closest('.window-controls')) return;
+        toggleMaximize();
+      });
+    }
+
+    /* ── Drag handler ── */
+    function makeDraggable(win, handle) {
+      let dragging = false, startX, startY, startL, startT;
+
+      function onStart(ex, ey) {
+        dragging = true;
+        startX = ex; startY = ey;
+        startL = parseInt(win.style.left) || 0;
+        startT = parseInt(win.style.top)  || 0;
+      }
+
+      function onMove(ex, ey) {
+        if (!dragging) return;
+        win.style.left = (startL + ex - startX) + 'px';
+        win.style.top  = (startT + ey - startY) + 'px';
+      }
+
+      function onEnd() { dragging = false; }
+
+      handle.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.window-controls')) return;
+        bringToFront(win);
+        onStart(e.clientX, e.clientY);
+        e.preventDefault();
+      });
+
+      handle.addEventListener('touchstart', (e) => {
+        if (e.target.closest('.window-controls')) return;
+        bringToFront(win);
+        onStart(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true });
+
+      document.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
+      document.addEventListener('touchmove', (e) => {
+        if (dragging) {
+          onMove(e.touches[0].clientX, e.touches[0].clientY);
+          e.preventDefault();
+        }
+      }, { passive: false });
+      document.addEventListener('mouseup', onEnd);
+      document.addEventListener('touchend', onEnd);
+    }
+
+    /* ── Resize handler ── */
+    function makeResizable(win, handle) {
+      let resizing = false, startX, startY, startW, startH;
+
+      function onStart(ex, ey) {
+        resizing = true;
+        startX = ex; startY = ey;
+        startW = win.offsetWidth;
+        startH = win.offsetHeight;
+      }
+
+      function onMove(ex, ey) {
+        if (!resizing) return;
+        win.style.width  = Math.max(320, startW + ex - startX) + 'px';
+        win.style.height = Math.max(200, startH + ey - startY) + 'px';
+      }
+
+      function onEnd() { resizing = false; }
+
+      handle.addEventListener('mousedown', (e) => {
+        onStart(e.clientX, e.clientY);
+        bringToFront(win);
+        e.preventDefault(); e.stopPropagation();
+      });
+
+      handle.addEventListener('touchstart', (e) => {
+        onStart(e.touches[0].clientX, e.touches[0].clientY);
+        bringToFront(win);
+      }, { passive: true });
+
+      document.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
+      document.addEventListener('touchmove', (e) => {
+        if (resizing) {
+          onMove(e.touches[0].clientX, e.touches[0].clientY);
+          e.preventDefault();
+        }
+      }, { passive: false });
+      document.addEventListener('mouseup', onEnd);
+      document.addEventListener('touchend', onEnd);
+    }
+
+    /* ─────────────────────────────────────────
+       ICON CLICKS
+    ───────────────────────────────────────── */
+    document.querySelectorAll('.app-icon').forEach(icon => {
+      icon.addEventListener('click', () => {
+        const appId = icon.dataset.app;
+        createWindow(appId);
+        // Hide hint after first click
+        const hint = document.getElementById('desktop-hint');
+        if (hint) hint.style.display = 'none';
+      });
+    });
+
+    /* ─────────────────────────────────────────
+       DESKTOP CLICK — deselect windows
+    ───────────────────────────────────────── */
+    document.getElementById('bg').addEventListener('click', () => {
+      document.querySelectorAll('.window').forEach(w => {
+        w.classList.remove('focused');
+        w.classList.add('unfocused');
+      });
+      document.getElementById('mb-active-title').textContent = '';
+    });
+  </script>
+</body>
+</html>
