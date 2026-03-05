@@ -21,6 +21,7 @@
       --radius-window: 12px;
       --radius-icon: 18px;
       --font: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --resume-accent: 80, 40, 180;
     }
 
     html, body {
@@ -168,11 +169,21 @@
       align-items: center;
       gap: 5px;
       cursor: pointer;
-      transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
+      padding: 7px 6px 6px;
+      border-radius: 16px;
+      border: 1px solid transparent;
+      transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1),
+                  background 0.2s ease, border-color 0.2s ease;
     }
 
-    .app-icon:hover { transform: scale(1.12); }
+    .app-icon:hover { transform: scale(1.08); }
     .app-icon:active { transform: scale(0.94); }
+
+    .app-icon.open {
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.3);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+    }
 
     .icon-img {
       width: 56px; height: 56px;
@@ -215,13 +226,7 @@
       line-height: 1.2;
     }
 
-    .icon-dot {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.6);
-      display: none;
-    }
-    .app-icon.open .icon-dot { display: block; }
+    .icon-dot { display: none; }
 
     /* ─────────────────────────────────────────
        WINDOWS
@@ -246,6 +251,13 @@
                   height 0.32s cubic-bezier(0.4,0,0.2,1),
                   border-radius 0.32s cubic-bezier(0.4,0,0.2,1),
                   box-shadow    0.32s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .window.is-resizing {
+      transition: left   0.16s cubic-bezier(0.25,0.46,0.45,0.94),
+                  top    0.16s cubic-bezier(0.25,0.46,0.45,0.94),
+                  width  0.16s cubic-bezier(0.25,0.46,0.45,0.94),
+                  height 0.16s cubic-bezier(0.25,0.46,0.45,0.94) !important;
     }
 
     .window.maximized {
@@ -425,55 +437,296 @@
       text-transform: uppercase;
     }
 
-    /* ─── Resume Window Content ─── */
-    .resume-window {
-      display: flex;
-      flex-direction: column;
+    /* ─── Resume View ─── */
+    .rv {
       width: 100%; height: 100%;
+      overflow-y: auto;
+      padding: 2.2rem 2.8rem 3rem;
+      background: #f8f8fa;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      color: #111;
+      cursor: auto;
+      user-select: text;
     }
-
-    .resume-toolbar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      background: rgba(240,237,255,0.9);
-      border-bottom: 1px solid rgba(0,0,0,0.08);
-      flex-shrink: 0;
+    .rv::-webkit-scrollbar { width: 5px; }
+    .rv::-webkit-scrollbar-track { background: transparent; }
+    .rv::-webkit-scrollbar-thumb {
+      background: rgba(var(--resume-accent), 0.3);
+      border-radius: 99px;
     }
-
-    .resume-url {
-      flex: 1;
-      font-size: 11px;
-      color: var(--text-muted);
-      background: rgba(255,255,255,0.8);
-      border: 1px solid rgba(0,0,0,0.12);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      cursor: text;
-    }
-
-    .resume-open-btn {
-      font-size: 11px;
-      font-weight: 600;
-      color: #4f46e5;
-      background: rgba(79,70,229,0.1);
-      border: 1px solid rgba(79,70,229,0.3);
-      border-radius: 6px;
-      padding: 4px 10px;
-      cursor: pointer;
-      white-space: nowrap;
+    .rv-topbar { display: flex; justify-content: flex-end; margin-bottom: 1.6rem; }
+    .rv-download {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      padding: 0.4rem 1rem; border-radius: 999px;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; text-decoration: none;
+      border: 1.5px solid rgb(var(--resume-accent));
+      color: rgb(var(--resume-accent));
+      background: rgba(var(--resume-accent), 0.06);
       transition: background 0.15s;
     }
-    .resume-open-btn:hover { background: rgba(79,70,229,0.18); }
-
-    .resume-iframe {
-      flex: 1;
-      border: none;
-      width: 100%;
-      background: #fff;
+    .rv-download:hover { background: rgba(var(--resume-accent), 0.14); }
+    .rv-header {
+      margin-bottom: 2rem; padding-bottom: 1.4rem;
+      border-bottom: 2px solid rgb(var(--resume-accent));
     }
+    .rv-name {
+      font-size: 2.6rem; font-weight: 800; letter-spacing: -0.045em;
+      line-height: 1; color: #06060f; margin-bottom: 0.45rem;
+    }
+    .rv-title {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.13em;
+      text-transform: uppercase; color: rgb(var(--resume-accent)); margin-bottom: 0.7rem;
+    }
+    .rv-contact {
+      display: flex; flex-wrap: wrap; gap: 0 1.4rem;
+      font-size: 0.76rem; color: rgba(0,0,0,0.45);
+    }
+    .rv-contact a { color: rgba(0,0,0,0.45); text-decoration: none; }
+    .rv-contact a:hover { color: rgb(var(--resume-accent)); }
+    .rv-section {
+      display: grid; grid-template-columns: 100px 1fr; gap: 0 1.6rem;
+      margin-bottom: 1.6rem; padding-bottom: 1.6rem;
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+    }
+    .rv-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .rv-label {
+      font-size: 0.62rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.15em; color: rgb(var(--resume-accent));
+      padding-top: 0.12rem; line-height: 1.5;
+    }
+    .rv-summary { font-size: 0.82rem; line-height: 1.75; color: rgba(0,0,0,0.62); }
+    .rv-job { margin-bottom: 1.1rem; }
+    .rv-job:last-child { margin-bottom: 0; }
+    .rv-job-head {
+      display: flex; flex-wrap: wrap; align-items: baseline;
+      gap: 0.2rem 0.55rem; margin-bottom: 0.35rem;
+    }
+    .rv-company { font-size: 0.86rem; font-weight: 800; color: #06060f; }
+    .rv-role { font-size: 0.8rem; color: rgba(0,0,0,0.55); }
+    .rv-meta { font-size: 0.7rem; color: rgba(0,0,0,0.35); margin-left: auto; white-space: nowrap; }
+    .rv-bullets { list-style: none; padding: 0; }
+    .rv-bullets li {
+      font-size: 0.78rem; line-height: 1.68; color: rgba(0,0,0,0.6);
+      padding-left: 1rem; position: relative; margin-bottom: 0.12rem;
+    }
+    .rv-bullets li::before {
+      content: '—'; position: absolute; left: 0;
+      color: rgba(var(--resume-accent), 0.5); font-size: 0.68rem;
+    }
+    .rv-stat { font-weight: 700; color: rgb(var(--resume-accent)); background: none; }
+    .rv-edu-item { margin-bottom: 0.55rem; }
+    .rv-edu-item:last-child { margin-bottom: 0; }
+    .rv-edu-degree { font-size: 0.84rem; font-weight: 700; color: #06060f; }
+    .rv-edu-school { font-size: 0.76rem; color: rgba(0,0,0,0.48); }
+    .rv-skills { display: flex; flex-direction: column; gap: 0.5rem; }
+    .rv-skill-row { display: flex; gap: 0.6rem; align-items: baseline; }
+    .rv-skill-cat {
+      font-size: 0.68rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.06em; color: rgb(var(--resume-accent));
+      min-width: 108px; flex-shrink: 0;
+    }
+    .rv-skill-list { font-size: 0.77rem; color: rgba(0,0,0,0.6); line-height: 1.55; }
+
+    /* ─────────────────────────────────────────
+       BEFORE A.I. — MULTI-PROJECT CASE STUDY
+    ───────────────────────────────────────── */
+    .bai-wrap {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(248,246,255,0.99) 100%);
+      overflow: hidden;
+      cursor: auto; user-select: text;
+    }
+
+    /* Tab bar */
+    .bai-tabs {
+      display: flex; flex-shrink: 0;
+      padding: 0 1.6rem;
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .bai-tab {
+      padding: 0.8rem 1.1rem 0.7rem;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase;
+      border: none; background: none; cursor: pointer;
+      color: rgba(20,10,40,0.28);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .bai-tab.active[data-panel="usbank"]     { color: rgb(0,82,155);   border-bottom-color: rgb(0,82,155); }
+    .bai-tab.active[data-panel="fareharbor"] { color: rgb(120,60,220); border-bottom-color: rgb(120,60,220); }
+
+    /* Panels */
+    .bai-panel {
+      display: none; flex: 1; overflow-y: auto;
+      padding: 1.8rem 2rem 2.4rem;
+    }
+    .bai-panel::-webkit-scrollbar { width: 4px; }
+    .bai-panel::-webkit-scrollbar-track { background: transparent; }
+    .bai-panel::-webkit-scrollbar-thumb { background: rgba(var(--bai-accent), 0.22); border-radius: 99px; }
+    .bai-panel.active {
+      display: block;
+      animation: bai-fadein 0.2s ease;
+    }
+    @keyframes bai-fadein {
+      from { opacity: 0; transform: translateY(5px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Hero */
+    .bai-hero { margin-bottom: 1.4rem; }
+    .bai-hero-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 0.5rem; }
+    .bai-tag {
+      font-size: 0.63rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(var(--bai-accent), 0.72);
+    }
+    .bai-hero-sep {
+      width: 3px; height: 3px; border-radius: 50%;
+      background: rgba(var(--bai-accent), 0.3);
+      display: inline-block;
+    }
+    .bai-company {
+      font-size: 1.9rem; font-weight: 800; letter-spacing: -0.04em;
+      line-height: 1; color: #0a0820; margin-bottom: 0.18rem;
+    }
+    .bai-role {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgb(var(--bai-accent));
+      margin-bottom: 0.8rem;
+    }
+    .bai-intro {
+      font-size: 0.81rem; line-height: 1.8; color: rgba(20,10,40,0.6);
+      padding-bottom: 1.35rem;
+      border-bottom: 1px solid rgba(var(--bai-accent), 0.1);
+    }
+
+    /* Stats */
+    .bai-stats {
+      display: flex; gap: 0; margin: 1.35rem 0;
+      border-radius: 10px; overflow: hidden;
+      border: 1px solid rgba(var(--bai-accent), 0.13);
+    }
+    .bai-stat {
+      flex: 1; padding: 0.85rem 0.8rem; text-align: center;
+      background: rgba(var(--bai-accent), 0.04);
+      border-right: 1px solid rgba(var(--bai-accent), 0.1);
+    }
+    .bai-stat:last-child { border-right: none; }
+    .bai-stat-n {
+      font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em;
+      color: rgb(var(--bai-accent)); line-height: 1; margin-bottom: 0.18rem;
+    }
+    .bai-stat-l {
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: rgba(20,10,40,0.38);
+    }
+
+    /* Section title */
+    .bai-section-title {
+      font-size: 0.59rem; font-weight: 800; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgb(var(--bai-accent));
+      margin-bottom: 0.75rem;
+    }
+
+    /* Work grid */
+    .bai-work-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.6rem; margin-bottom: 1.4rem;
+    }
+    .bai-work-card {
+      display: flex; gap: 0.65rem; align-items: flex-start;
+      padding: 0.85rem; border-radius: 10px;
+      background: rgba(255,255,255,0.85);
+      border: 1px solid rgba(var(--bai-accent), 0.1);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .bai-work-card:hover {
+      border-color: rgba(var(--bai-accent), 0.28);
+      box-shadow: 0 4px 14px rgba(var(--bai-accent), 0.08);
+    }
+    .bai-work-icon { font-size: 1.25rem; line-height: 1; flex-shrink: 0; margin-top: 0.05rem; }
+    .bai-work-name { font-size: 0.76rem; font-weight: 700; color: #0a0820; margin-bottom: 0.26rem; line-height: 1.3; }
+    .bai-work-desc { font-size: 0.71rem; line-height: 1.65; color: rgba(20,10,40,0.54); }
+
+    /* Gallery */
+    .bai-gallery { margin-bottom: 1.4rem; }
+    .bai-gallery-hero {
+      width: 100%; border-radius: 10px; overflow: hidden;
+      margin-bottom: 0.55rem;
+      border: 1px solid rgba(var(--bai-accent), 0.1);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.09);
+      background: rgba(var(--bai-accent), 0.05);
+      line-height: 0;
+    }
+    .bai-gallery-hero img {
+      width: 100%; height: 185px; object-fit: cover; object-position: top;
+      display: block; transition: transform 0.4s ease;
+    }
+    .bai-gallery-hero:hover img { transform: scale(1.025); }
+    .bai-gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.55rem; }
+    .bai-gallery-thumb {
+      border-radius: 8px; overflow: hidden;
+      border: 1px solid rgba(var(--bai-accent), 0.1);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+      background: rgba(var(--bai-accent), 0.05);
+      line-height: 0; cursor: zoom-in;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .bai-gallery-thumb:hover {
+      border-color: rgba(var(--bai-accent), 0.3);
+      box-shadow: 0 6px 20px rgba(var(--bai-accent), 0.12);
+    }
+    .bai-gallery-thumb img {
+      width: 100%; height: 82px; object-fit: cover; object-position: top;
+      display: block; transition: transform 0.32s ease;
+    }
+    .bai-gallery-thumb:hover img { transform: scale(1.05); }
+    .bai-gallery-caption {
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.06em;
+      color: rgb(var(--bai-accent)); text-transform: uppercase;
+      padding: 0.3rem 0.55rem 0.32rem;
+      background: rgba(var(--bai-accent), 0.05);
+      line-height: 1;
+    }
+    .bai-gallery-nda {
+      height: 82px; display: flex; align-items: center; justify-content: center;
+      background: rgba(var(--bai-accent), 0.04);
+    }
+    .bai-gallery-nda span {
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.05em;
+      text-transform: uppercase; color: rgba(var(--bai-accent), 0.5);
+      text-align: center; padding: 0 0.6rem; line-height: 1.5;
+    }
+
+    /* Approach pills */
+    .bai-approach { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.4rem; }
+    .bai-pill {
+      font-size: 0.66rem; font-weight: 700; letter-spacing: 0.04em;
+      padding: 0.28rem 0.7rem; border-radius: 999px;
+      border: 1.5px solid rgba(var(--bai-accent), 0.28);
+      color: rgb(var(--bai-accent));
+      background: rgba(var(--bai-accent), 0.05);
+    }
+
+    /* CTA */
+    .bai-visit {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; text-decoration: none;
+      color: rgb(var(--bai-accent));
+      padding: 0.4rem 1rem; border-radius: 999px;
+      border: 1.5px solid rgb(var(--bai-accent));
+      background: rgba(var(--bai-accent), 0.05);
+      transition: background 0.15s;
+    }
+    .bai-visit:hover { background: rgba(var(--bai-accent), 0.13); }
 
     /* ─────────────────────────────────────────
        COLOR PANEL
@@ -604,16 +857,16 @@
   <!-- Menu Bar -->
   <div id="menubar">
     <div class="mb-left">
-      <span class="mb-logo">✦</span>
-      <span class="mb-name">RC Tucker</span>
+      <span class="mb-logo">✌️</span>
+      <span class="mb-name">Ricky Tucker</span>
       <div class="mb-sep"></div>
-      <span class="mb-subtitle">Lead Product Designer</span>
+      <span class="mb-subtitle">Product Design & strategy</span>
     </div>
     <div class="mb-center" id="mb-active-title"></div>
     <div class="mb-right">
       <div class="mb-status">
-        <span class="mb-icon">◈</span>
-        <span class="mb-icon">⌘</span>
+        <!--<span class="mb-icon">◈</span> -->
+        <!-- <span class="mb-icon">⌘</span> -->
         <span id="clock">00:00</span>
       </div>
     </div>
@@ -691,6 +944,7 @@
 
     function applyTint() {
       overlay.style.background = `rgba(${activeRgb}, ${activeOpacity})`;
+      document.documentElement.style.setProperty('--resume-accent', activeRgb);
     }
 
     const swatchContainer = document.getElementById('cp-swatches');
@@ -752,7 +1006,7 @@
     }
 
     const smileys = [
-      '😊','😄','😁','🙂','😀','😃','🤩','😎',
+      '😊','😄','😁','🙂','😀','🤩','😎',
       '🥳','😋','🤗','😇','🌟','✨','💫','🎉',
       '🦋','🌈','🎨','🚀','💡','🎸','🦄','🍀'
     ];
@@ -773,16 +1027,189 @@
         }
       },
       'before-ai': {
-        title: 'Before A.I.',
-        width: 420, height: 380,
+        title: 'Before A.I. — Selected Work',
+        width: 720, height: 620,
         buildContent: () => {
-          const emoji = smileys[Math.floor(Math.random() * smileys.length)];
           const div = document.createElement('div');
-          div.className = 'smiley-window';
+          div.className = 'bai-wrap';
           div.innerHTML = `
-            <div class="smiley-emoji">${emoji}</div>
-            <div class="smiley-note">Before A.I. — Coming Soon</div>
+            <div class="bai-tabs">
+              <button class="bai-tab active" data-panel="usbank">US Bank · 2021–Present</button>
+              <button class="bai-tab" data-panel="fareharbor">FareHarbor · 2018–2021</button>
+            </div>
+
+            <!-- ── US BANK PANEL ── -->
+            <div class="bai-panel active" id="bai-usbank" style="--bai-accent: 0, 82, 155;">
+              <div class="bai-hero">
+                <div class="bai-hero-meta">
+                  <span class="bai-tag">2021 – Present</span>
+                  <span class="bai-hero-sep"></span>
+                  <span class="bai-tag">Minneapolis, MN</span>
+                </div>
+                <div class="bai-company">US Bank</div>
+                <div class="bai-role">Senior Product Designer</div>
+                <p class="bai-intro">Leading product design across consumer banking platforms — checking, credit, and mortgage — serving over one million users. Research uncovered that fragmented information architecture was silently driving support call volume, prompting a ground-up rethinking of account management UX. Now leading Corporate Wealth Management and Investment Services, designing institutional cash management and pricing valuation tools.</p>
+              </div>
+              <div class="bai-stats">
+                <div class="bai-stat"><div class="bai-stat-n">1M+</div><div class="bai-stat-l">Users reached</div></div>
+                <div class="bai-stat"><div class="bai-stat-n">30%</div><div class="bai-stat-l">Usability lift</div></div>
+                <div class="bai-stat"><div class="bai-stat-n">15%</div><div class="bai-stat-l">Fewer support calls</div></div>
+              </div>
+              <div class="bai-section-title">Featured Work</div>
+              <div class="bai-work-grid">
+                <div class="bai-work-card">
+                  <div class="bai-work-icon">🏦</div>
+                  <div class="bai-work-info">
+                    <div class="bai-work-name">Account Management Redesign</div>
+                    <div class="bai-work-desc">Unified fragmented account details, settings, services, and card management into a coherent IA aligned to real user mental models — cutting friction and call volume.</div>
+                  </div>
+                </div>
+                <div class="bai-work-card">
+                  <div class="bai-work-icon">📊</div>
+                  <div class="bai-work-info">
+                    <div class="bai-work-name">Consumer Banking Platforms</div>
+                    <div class="bai-work-desc">Designed across responsive web (React), iOS, and Android for checking, credit, and mortgage product lines — prioritising clarity and task efficiency at every touchpoint.</div>
+                  </div>
+                </div>
+                <div class="bai-work-card">
+                  <div class="bai-work-icon">💼</div>
+                  <div class="bai-work-info">
+                    <div class="bai-work-name">Wealth Management Tools</div>
+                    <div class="bai-work-desc">Led design for institutional cash management and pricing valuation — translating complex financial workflows into clear, operator-friendly interfaces for enterprise clients.</div>
+                  </div>
+                </div>
+                <div class="bai-work-card">
+                  <div class="bai-work-icon">🔬</div>
+                  <div class="bai-work-info">
+                    <div class="bai-work-name">Research & IA Strategy</div>
+                    <div class="bai-work-desc">Applied card sorting, affinity mapping, and journey mapping to surface user mental models — all validated through structured pilot testing before platform-wide release.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="bai-section-title">Visual Work</div>
+              <div class="bai-gallery">
+                <div class="bai-gallery-hero">
+                  <img src="https://freight.cargo.site/t/original/i/4664b687ba7062553ad8014ae82e9ce4171d10b8b3ade81fec8e49b220fd44c1/Screenshot-2025-10-07-at-5.34.59PM.png" alt="US Bank account management interface" loading="lazy" />
+                </div>
+                <div class="bai-gallery-grid">
+                  <div class="bai-gallery-thumb">
+                    <img src="https://freight.cargo.site/t/original/i/097b3b07c39e11cff12965c758c2694a31e70ac91f2f1f3f11ea5a549f7aee28/Screenshot-2025-10-07-at-5.32.07PM.png" alt="US Bank account settings" loading="lazy" />
+                    <div class="bai-gallery-caption">Account Settings</div>
+                  </div>
+                  <div class="bai-gallery-thumb">
+                    <img src="https://freight.cargo.site/t/original/i/c160044b3a9b467d467888eb9b2c3ab881d54a863e2217703beb5100574d3bdb/Screenshot-2025-10-07-at-5.32.15PM.png" alt="US Bank card management" loading="lazy" />
+                    <div class="bai-gallery-caption">Card Management</div>
+                  </div>
+                  <div class="bai-gallery-thumb" style="cursor:default;">
+                    <div class="bai-gallery-nda"><span>Assets restricted per NDA</span></div>
+                    <div class="bai-gallery-caption">Wealth Management</div>
+                  </div>
+                </div>
+              </div>
+              <div class="bai-section-title">Design Approach</div>
+              <div class="bai-approach">
+                <span class="bai-pill">Card Sorting</span>
+                <span class="bai-pill">Affinity Mapping</span>
+                <span class="bai-pill">Journey Mapping</span>
+                <span class="bai-pill">IA Redesign</span>
+                <span class="bai-pill">Pilot Testing</span>
+                <span class="bai-pill">Onboarding UX</span>
+                <span class="bai-pill">Design Systems</span>
+              </div>
+              <a class="bai-visit" href="https://rctucker.com/U-S-Bank" target="_blank" rel="noopener">↗ View full case study</a>
+            </div>
+
+            <!-- ── FAREHARBOR PANEL ── -->
+            <div class="bai-panel" id="bai-fareharbor" style="--bai-accent: 120, 60, 220;">
+              <div class="bai-hero">
+                <div class="bai-hero-meta">
+                  <span class="bai-tag">2018 – 2021</span>
+                  <span class="bai-hero-sep"></span>
+                  <span class="bai-tag">San Francisco, CA</span>
+                </div>
+                <div class="bai-company">FareHarbor</div>
+                <div class="bai-role">Product Designer</div>
+                <p class="bai-intro">FareHarbor is a leading booking and operations platform serving the global tourism and activity industry. As a core member of the product design team, I shaped end-to-end experiences across operator-facing tools and consumer booking flows — translating research insights into scalable, consistent design patterns that elevated the product at every touchpoint.</p>
+              </div>
+              <div class="bai-stats">
+                <div class="bai-stat"><div class="bai-stat-n">18%</div><div class="bai-stat-l">Conversion lift</div></div>
+                <div class="bai-stat"><div class="bai-stat-n">40%</div><div class="bai-stat-l">Fewer QA revisions</div></div>
+                <div class="bai-stat"><div class="bai-stat-n">3 yrs</div><div class="bai-stat-l">Product tenure</div></div>
+              </div>
+              <div class="bai-section-title">Featured Work</div>
+              <div class="bai-work-grid">
+                <div class="bai-work-card">
+                  <div class="bai-work-icon">🎟️</div>
+                  <div class="bai-work-info">
+                    <div class="bai-work-name">Online Booking Flows</div>
+                    <div class="bai-work-desc">Redesigned consumer reservation experiences through iterative usability testing and high-fidelity prototyping — driving measurable uplift in booking conversion.</div>
+                  </div>
+                </div>
+                <div class="bai-work-card">
+                  <div class="bai-work-icon">🗺️</div>
+                  <div class="bai-work-info">
+                    <div class="bai-work-name">Venue Mapping & Seat Allocation</div>
+                    <div class="bai-work-desc">Pioneered first-of-its-kind interactive seat mapping for the tourism industry — enabling real-time allocation and dramatically expanding operator capability.</div>
+                  </div>
+                </div>
+                <div class="bai-work-card">
+                  <div class="bai-work-icon">📐</div>
+                  <div class="bai-work-info">
+                    <div class="bai-work-name">Figma Design System</div>
+                    <div class="bai-work-desc">Architected and maintained a unified component library as the company scaled — ensuring cross-surface consistency and significantly accelerating design-to-dev handoff.</div>
+                  </div>
+                </div>
+                <div class="bai-work-card">
+                  <div class="bai-work-icon">📱</div>
+                  <div class="bai-work-info">
+                    <div class="bai-work-name">Mobile-First UX</div>
+                    <div class="bai-work-desc">Established responsive mobile patterns that reduced onboarding friction, improved ease-of-use scores, and strengthened long-term client retention.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="bai-section-title">Visual Work</div>
+              <div class="bai-gallery">
+                <div class="bai-gallery-hero">
+                  <img src="https://freight.cargo.site/t/original/i/3b323180902e8a9c4a96859da9447e6e5ba91358b46fa36425577afd64a41d03/Luau_online_macair.png" alt="FareHarbor online booking interface on MacBook" loading="lazy" />
+                </div>
+                <div class="bai-gallery-grid">
+                  <div class="bai-gallery-thumb">
+                    <img src="https://freight.cargo.site/t/original/i/320aa23361230dd0579fa111c6a3295ded6b154b88d35bb7028d1bfbc66d691e/Screenshot-2025-10-08-at-9.03.58PM.png" alt="FareHarbor operator dashboard" loading="lazy" />
+                    <div class="bai-gallery-caption">Operator Dashboard</div>
+                  </div>
+                  <div class="bai-gallery-thumb">
+                    <img src="https://freight.cargo.site/t/original/i/4768172461c8221c413a76d26813836bf1a32a0c183c0588632f93b07195c800/Screenshot-2025-10-08-at-8.56.38PM.png" alt="FareHarbor venue mapping" loading="lazy" />
+                    <div class="bai-gallery-caption">Venue Mapping</div>
+                  </div>
+                  <div class="bai-gallery-thumb">
+                    <img src="https://freight.cargo.site/t/original/i/c029bf90c8bb438f2f98168ed353a4e425afaedad87b7bd9aae88a8c41498655/mobile_screens.png" alt="FareHarbor mobile responsive designs" loading="lazy" />
+                    <div class="bai-gallery-caption">Mobile UX</div>
+                  </div>
+                </div>
+              </div>
+              <div class="bai-section-title">Design Approach</div>
+              <div class="bai-approach">
+                <span class="bai-pill">User Research</span>
+                <span class="bai-pill">Personas & Flows</span>
+                <span class="bai-pill">Usability Testing</span>
+                <span class="bai-pill">Prototyping</span>
+                <span class="bai-pill">Design Systems</span>
+                <span class="bai-pill">Mobile-First</span>
+                <span class="bai-pill">Dev Handoff</span>
+              </div>
+              <a class="bai-visit" href="https://rctucker.com/Fareharbor" target="_blank" rel="noopener">↗ View full case study</a>
+            </div>
           `;
+
+          // Wire up tab switching
+          div.querySelector('.bai-tabs').addEventListener('click', (e) => {
+            const tab = e.target.closest('.bai-tab');
+            if (!tab) return;
+            const panelId = 'bai-' + tab.dataset.panel;
+            div.querySelectorAll('.bai-tab').forEach(t => t.classList.toggle('active', t === tab));
+            div.querySelectorAll('.bai-panel').forEach(p => p.classList.toggle('active', p.id === panelId));
+          });
+
           return div;
         }
       },
@@ -802,23 +1229,99 @@
       },
       'resume': {
         title: 'Resume — RC Tucker',
-        width: 700, height: 520,
+        width: 680, height: 580,
         buildContent: () => {
           const div = document.createElement('div');
-          div.className = 'resume-window';
+          div.className = 'rv';
           div.innerHTML = `
-            <div class="resume-toolbar">
-              <span class="resume-url">www.rctucker.com</span>
-              <button class="resume-open-btn" onclick="window.open('https://www.rctucker.com','_blank')">
-                ↗ Open
-              </button>
+            <div class="rv-topbar">
+              <a class="rv-download" href="assets/resume.pdf" download="Ricky-Tucker-Resume.pdf">↓ Download PDF</a>
             </div>
-            <iframe
-              class="resume-iframe"
-              src="https://www.rctucker.com"
-              title="RC Tucker Resume"
-              allow="fullscreen"
-            ></iframe>
+            <header class="rv-header">
+              <div class="rv-name">Ricky Tucker</div>
+              <div class="rv-title">Lead Product Designer &nbsp;|&nbsp; UX Strategy &amp; Digital Product Innovation</div>
+              <div class="rv-contact">
+                <a href="mailto:rickyctucker@gmail.com">rickyctucker@gmail.com</a>
+                <span>952-412-3045</span>
+                <a href="https://rctucker.com" target="_blank" rel="noopener">rctucker.com</a>
+              </div>
+            </header>
+            <div class="rv-section">
+              <div class="rv-label">Summary</div>
+              <p class="rv-summary">Lead Product Designer with <span class="rv-stat">10+ years</span> of experience creating user-centered digital products in fintech, SaaS, and enterprise platforms. Skilled in UX/UI design, design systems, user research, and product strategy, with a proven record of delivering measurable business impact and mentoring design teams.</p>
+            </div>
+            <div class="rv-section">
+              <div class="rv-label">Experience</div>
+              <div>
+                <div class="rv-job">
+                  <div class="rv-job-head">
+                    <span class="rv-company">US Bank</span>
+                    <span class="rv-role">Senior Product Designer</span>
+                    <span class="rv-meta">Minneapolis, MN &nbsp;·&nbsp; 2021 – Present</span>
+                  </div>
+                  <ul class="rv-bullets">
+                    <li>Reimagined consumer account management platforms for <span class="rv-stat">1M+ users</span>, boosting usability by <span class="rv-stat">30%</span> and reducing support calls by <span class="rv-stat">15%</span>.</li>
+                    <li>Designed enterprise solutions that cut operational inefficiencies by <span class="rv-stat">20%+</span>.</li>
+                    <li>Drove design system adoption, improving cross-platform consistency and reducing delivery time by <span class="rv-stat">25%</span>.</li>
+                  </ul>
+                </div>
+                <div class="rv-job">
+                  <div class="rv-job-head">
+                    <span class="rv-company">FareHarbor</span>
+                    <span class="rv-role">Product Designer</span>
+                    <span class="rv-meta">San Francisco, CA &nbsp;·&nbsp; 2018 – 2021</span>
+                  </div>
+                  <ul class="rv-bullets">
+                    <li>Optimized booking flows via usability testing &amp; prototyping, raising conversion rates by <span class="rv-stat">18%</span>.</li>
+                    <li>Built mobile-first UX patterns, reducing onboarding friction and improving client retention.</li>
+                    <li>Streamlined design-to-dev handoff, cutting QA revisions by <span class="rv-stat">40%</span>.</li>
+                  </ul>
+                </div>
+                <div class="rv-job">
+                  <div class="rv-job-head">
+                    <span class="rv-company">Works Design &amp; MFG</span>
+                    <span class="rv-role">Product Designer / Manager</span>
+                    <span class="rv-meta">New York, NY &nbsp;·&nbsp; 2016 – 2018</span>
+                  </div>
+                  <ul class="rv-bullets">
+                    <li>Delivered <span class="rv-stat">20+</span> experiential projects for Fortune 500 clients on-time and within budget.</li>
+                    <li>Led cross-functional teams bridging creative design with engineering execution.</li>
+                  </ul>
+                </div>
+                <div class="rv-job">
+                  <div class="rv-job-head">
+                    <span class="rv-company">Pentagram Design</span>
+                    <span class="rv-role">Industrial Designer</span>
+                    <span class="rv-meta">New York, NY &nbsp;·&nbsp; 2014 – 2015</span>
+                  </div>
+                  <ul class="rv-bullets">
+                    <li>Designed scalable wayfinding and environmental systems for cultural and commercial spaces.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="rv-section">
+              <div class="rv-label">Education</div>
+              <div>
+                <div class="rv-edu-item">
+                  <div class="rv-edu-degree">MA — Product / Industrial Design</div>
+                  <div class="rv-edu-school">Florence Design Academy, Italy</div>
+                </div>
+                <div class="rv-edu-item">
+                  <div class="rv-edu-degree">BSc — Bio-Systems Design &amp; Engineering</div>
+                  <div class="rv-edu-school">University of Minnesota, USA</div>
+                </div>
+              </div>
+            </div>
+            <div class="rv-section">
+              <div class="rv-label">Skills</div>
+              <div class="rv-skills">
+                <div class="rv-skill-row"><span class="rv-skill-cat">Design &amp; UX</span><span class="rv-skill-list">UX/UI Design, Design Systems, Wireframing, Prototyping, Accessibility (WCAG)</span></div>
+                <div class="rv-skill-row"><span class="rv-skill-cat">Research</span><span class="rv-skill-list">User Research, Usability Testing, A/B Testing, Data-Driven Design</span></div>
+                <div class="rv-skill-row"><span class="rv-skill-cat">Tools</span><span class="rv-skill-list">Figma, Adobe Creative Suite, SolidWorks, SketchUp, AutoCAD, HTML/CSS/JS</span></div>
+                <div class="rv-skill-row"><span class="rv-skill-cat">Collaboration</span><span class="rv-skill-list">Agile/Scrum, Stakeholder Management, Cross-Functional Leadership</span></div>
+              </div>
+            </div>
           `;
           return div;
         }
@@ -839,14 +1342,19 @@
         return;
       }
 
-      const pos = randomPos(cfg.width, cfg.height);
+      // Size each window at ~80% of available viewport
+      const _mh   = var_menubarH();
+      const winW  = Math.round((window.innerWidth  - DOCK_SAFE - WIN_PAD * 2) * 0.80);
+      const winH  = Math.round((window.innerHeight - _mh       - WIN_PAD * 2) * 0.80);
+
+      const pos = randomPos(winW, winH);
 
       const win = document.createElement('div');
       win.className = 'window unfocused';
       win.style.left   = pos.left + 'px';
       win.style.top    = pos.top  + 'px';
-      win.style.width  = cfg.width + 'px';
-      win.style.height = cfg.height + 'px';
+      win.style.width  = winW + 'px';
+      win.style.height = winH + 'px';
       win.style.zIndex = zTop;
 
       // Title bar
@@ -908,7 +1416,7 @@
       // ── Minimize button — restore to original size if maximized, else collapse ──
       const origSize = {
         left: pos.left + 'px', top: pos.top + 'px',
-        width: cfg.width + 'px', height: cfg.height + 'px'
+        width: winW + 'px', height: winH + 'px'
       };
 
       win.querySelector('.btn-minimize').addEventListener('click', (e) => {
@@ -1056,6 +1564,60 @@
       document.addEventListener('mouseup', onEnd);
       document.addEventListener('touchend', onEnd);
     }
+
+    /* ─────────────────────────────────────────
+       RESPONSIVE VIEWPORT RESIZE
+    ───────────────────────────────────────── */
+    const DOCK_SAFE  = 140;  // px reserved on right for the icon dock
+    const WIN_PAD    = 8;    // min gap from viewport edges
+
+    function clampWindow(win) {
+      const mh = var_menubarH();
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      if (win.classList.contains('maximized')) {
+        // Maximized windows fill the new viewport exactly
+        win.style.left   = '0px';
+        win.style.top    = mh + 'px';
+        win.style.width  = vw + 'px';
+        win.style.height = (vh - mh) + 'px';
+        return;
+      }
+
+      let left = parseInt(win.style.left) || 0;
+      let top  = parseInt(win.style.top)  || 0;
+      const w  = win.offsetWidth;
+      const h  = win.offsetHeight;
+
+      // Clamp horizontal: keep at least 120px of title bar inside safe area
+      const minVisible = 120;
+      const rightBound = vw - DOCK_SAFE;
+      left = Math.min(left, rightBound - minVisible);
+      left = Math.max(WIN_PAD, left);
+
+      // Clamp vertical: title bar must stay below menubar and above bottom edge
+      top = Math.max(mh + WIN_PAD, top);
+      top = Math.min(top, vh - 38 - WIN_PAD); // 38 = titlebar height
+
+      win.style.left = left + 'px';
+      win.style.top  = top  + 'px';
+    }
+
+    let _resizeSettleTimer;
+    window.addEventListener('resize', () => {
+      // Enable smooth transitions on all windows for the duration of the resize
+      document.querySelectorAll('.window').forEach(w => w.classList.add('is-resizing'));
+
+      // Clamp every open window to the new bounds
+      Object.values(openWindows).forEach(win => clampWindow(win));
+
+      // Strip the transition class shortly after resize settles
+      clearTimeout(_resizeSettleTimer);
+      _resizeSettleTimer = setTimeout(() => {
+        document.querySelectorAll('.window').forEach(w => w.classList.remove('is-resizing'));
+      }, 300);
+    });
 
     /* ─────────────────────────────────────────
        ICON CLICKS
