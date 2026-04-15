@@ -524,6 +524,90 @@
       border-radius: 1px;
     }
 
+    /* ─── After A.I. Window ─── */
+    .aai-wrap {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      font-family: var(--font);
+      background: rgba(10,10,12,0.98);
+      overflow: hidden;
+      cursor: auto; user-select: text;
+    }
+    .aai-tabs {
+      display: flex; flex-shrink: 0;
+      padding: 0 1.6rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .aai-tab {
+      padding: 0.75rem 1rem 0.65rem;
+      font-size: var(--text-xs); font-weight: 600; letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+      border: none; background: none; cursor: pointer;
+      color: var(--color-text-muted);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+      font-family: var(--font);
+    }
+    .aai-tab.active { color: var(--color-accent); border-bottom-color: var(--color-accent); }
+    .aai-panel {
+      display: none; flex: 1; overflow-y: auto;
+      padding: 1.8rem 2rem 2.4rem;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+    .aai-panel::-webkit-scrollbar { width: 4px; }
+    .aai-panel::-webkit-scrollbar-track { background: transparent; }
+    .aai-panel::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: var(--radius-full); }
+    .aai-panel.active { display: flex; animation: bai-fadein 0.2s ease; }
+
+    .aai-heading {
+      flex-shrink: 0;
+      padding: 1.5rem 1.6rem 1rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .aai-heading .t-h1 { margin-bottom: 0.2rem; }
+    .aai-heading .t-small { color: var(--color-text-muted); }
+    .aai-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.8rem 2rem 2.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+    .aai-body::-webkit-scrollbar { width: 4px; }
+    .aai-body::-webkit-scrollbar-track { background: transparent; }
+    .aai-body::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: var(--radius-full); }
+    .aai-section-title {
+      color: var(--color-text-primary);
+      margin-bottom: 0;
+    }
+    .aai-diagram {
+      width: 100%;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      background: #080809;
+      padding: 1.2rem 1.4rem;
+    }
+
+    .aai-image-placeholder {
+      width: 100%;
+      height: 180px;
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--color-border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      background: var(--color-surface);
+    }
+
     /* ─── Smiley Window Content ─── */
     .smiley-window {
       display: flex;
@@ -1167,16 +1251,54 @@
 
     const appConfig = {
       'after-ai': {
-        title: 'After A.I.',
-        width: 420, height: 380,
+        title: 'After A.I. — The Automated Years',
+        width: 680, height: 620,
         buildContent: () => {
-          const emoji = smileys[Math.floor(Math.random() * smileys.length)];
           const div = document.createElement('div');
-          div.className = 'smiley-window';
+          div.className = 'aai-wrap';
           div.innerHTML = `
-            <div class="smiley-emoji">${emoji}</div>
-            <div class="smiley-note">After A.I. — Coming Soon</div>
+            <div class="aai-heading" style="flex-shrink:0;padding:1.5rem 1.6rem 1rem;border-bottom:1px solid var(--color-border);">
+              <h1 class="t-h1">After A.I.</h1>
+              <p class="t-small">The Automated Years</p>
+            </div>
+            <div class="aai-tabs">
+              <button class="aai-tab active" data-panel="usbank">@USBank</button>
+              <button class="aai-tab" data-panel="personal">Personal</button>
+            </div>
+
+            <!-- ── US BANK PANEL ── -->
+            <div class="aai-panel active" id="aai-usbank">
+              <h2 class="t-h3 aai-section-title">Designing at the Intersection of Product, Design, and AI</h2>
+              <p class="t-body">Leveraging AI effectively as a designer goes beyond accelerating output — it's about fundamentally changing how you show up across the product development process. From research and requirements gathering to prototyping and implementation, the distance between an idea and a testable artifact has compressed dramatically, which has meaningfully reshaped how I approach the role.</p>
+              <div class="aai-diagram">
+                <img src="assets/ai-compression.png" alt="A.I. compression diagram" style="width:100%;height:auto;display:block;border-radius:4px;" />
+              </div>
+              <p class="t-body">At US Bank, I use Copilot to help move research insights into requirements documentation more efficiently. With that time back, it meant I could focus more on the actual design work — more solid requirments, tighter iteration, more protyping, and earlier conversations with stakeholders. Showing working prototypes instead of static mockups changes the quality of the feedback, and that makes a real difference in continuing to improve design.</p>
+              <div class="aai-image-placeholder">Images coming soon</div>
+              <p class="t-body">I've also been part of the CRE Document Intelligence team, which has been a different kind of challenge. The project applies AI to commercial real estate workflows — building a system that can search and review historical offering memos and deal documents to surface what's relevant. My role has been sitting between the business clients and the AI teams, running workshops and helping everyone stay aligned on what we're actually building and why. A lot of it is translation work, and I've learned the most doing it.</p>
+              <p class="t-body">We're currently in the kickoff phase of the next layer of that work — designing a system to capture and organize a broad array of document data and structure it into a data lake. The longer-term goal is to use that dataset to power agentic strategic insights for CRE stakeholders, giving them a way to ask harder questions and get answers grounded in their own historical data.</p>
+              <div class="aai-image-placeholder">Images coming soon</div>
+            </div>
+
+            <!-- ── PERSONAL PANEL ── -->
+            <div class="aai-panel" id="aai-personal">
+              <h2 class="t-h3 aai-section-title">Building What I Design</h2>
+              <p class="t-body">Outside of work, I built my entire personal website using VS Code, Claude Code, and GitHub. That was intentional. If I'm going to advocate for this kind of workflow, I wanted to actually live in it — not just design something and hand it off, but own the whole thing end to end. Doing that shifted something for me. When you know you can build what you're designing, you start designing differently.</p>
+              <div class="aai-diagram">
+                <img src="assets/Claudeshot.png" alt="Claude Code screenshot" style="width:100%;height:auto;display:block;border-radius:4px;" />
+              </div>
+              <p class="t-body">That's really what all of this comes down to for me. AI doesn't make the design decisions — you still have to have good judgment for that. But it's removed a lot of the friction that used to sit between the thinking and the making.</p>
+              <div class="aai-image-placeholder">Images coming soon</div>
+            </div>
           `;
+          div.querySelector('.aai-tabs').addEventListener('click', e => {
+            const btn = e.target.closest('.aai-tab');
+            if (!btn) return;
+            div.querySelectorAll('.aai-tab').forEach(t => t.classList.remove('active'));
+            div.querySelectorAll('.aai-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            div.querySelector(`#aai-${btn.dataset.panel}`).classList.add('active');
+          });
           return div;
         }
       },
@@ -1373,14 +1495,23 @@
       },
       'about': {
         title: 'About RC Tucker',
-        width: 420, height: 380,
+        width: 520, height: 560,
         buildContent: () => {
-          const emoji = smileys[Math.floor(Math.random() * smileys.length)];
           const div = document.createElement('div');
-          div.className = 'smiley-window';
+          div.className = 'aai-wrap';
           div.innerHTML = `
-            <div class="smiley-emoji">${emoji}</div>
-            <div class="smiley-note">About — Coming Soon</div>
+            <div class="aai-heading" style="flex-shrink:0;padding:1.5rem 1.6rem 1rem;border-bottom:1px solid var(--color-border);">
+              <h1 class="t-h1">Hi, I'm Ricky 👋</h1>
+              <p class="t-small">a lil about me</p>
+            </div>
+            <div class="aai-panel active" style="display:flex;">
+              <p class="t-small" style="color:var(--color-text-muted);font-weight:600;letter-spacing:var(--tracking-wide);text-transform:uppercase;">Pre–2018</p>
+              <p class="t-body">Industrial and experiential design across a wide range of companies, applications, and industries. My background spans bio-systems engineering and industrial design — a path that took me from medical product design engineering to shaping some of New York City's most memorable physical spaces: hospital interiors, museum galleries, bars, restaurants, residential and commercial environments, and large-scale brand activations.</p>
+              <p class="t-body">This work lived in three dimensions. Every project was grounded in human-centered thinking and brought to life through 3D modeling and CAD manufacturing — translating ideas directly into built reality.</p>
+              <p class="t-small" style="color:var(--color-text-muted);font-weight:600;letter-spacing:var(--tracking-wide);text-transform:uppercase;margin-top:0.5rem;">Beyond the work</p>
+              <p class="t-body">Outside of work I'm usually chasing something — waves, snow, or pavement on a skateboard. I love long-distance bicycle touring, tinkering with mechanical and electrical projects, and getting lost in a good book.</p>
+              <p class="t-body">I also have a blue heeler named Mildred. 🐕</p>
+            </div>
           `;
           return div;
         }
